@@ -1,0 +1,7 @@
+[package]
+name = "snippet"
+version = "0.1.0"
+authors = ["Ted Mielczarek <ted@mielczarek.org>"]
+
+[dependencies]
+itoa = "0.3.4"
