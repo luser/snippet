@@ -1,0 +1,57 @@
+os: Visual Studio 2015
+
+environment:
+  matrix:
+    - channel: stable
+      target: x86_64-pc-windows-msvc
+    - channel: beta
+      target: x86_64-pc-windows-msvc
+    - channel: nightly
+      target: x86_64-pc-windows-msvc
+    - channel: 1.21.0 # Oldest supported version. Keep in sync with README.md.
+      target: x86_64-pc-windows-msvc
+
+cache:
+  - 'C:\Users\appveyor\.cargo'
+  - target
+
+matrix:
+  allow_failures:
+    - channel: nightly
+
+install:
+- appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
+- rustup-init.exe -y --default-host %target% --default-toolchain %channel%
+- set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
+- rustc -V
+- cargo -V
+
+build_script:
+- cmd: cargo build --release --verbose
+
+test_script:
+- cmd: cargo test --all --release --verbose
+
+branches:
+  only:
+    - master
+    - /\d+\.\d+\.\d+/
+
+before_deploy:
+  - ps: |
+        $NAME = "snippet-{env:APPVEYOR_REPO_TAG_NAME}-${env:TARGET}"
+        New-Item -Path $NAME -ItemType directory
+        Copy-Item target/release/snippet.exe "${NAME}/"
+        7z a -ttar "${NAME}.tar" "${NAME}"
+        7z a "${NAME}.tar.gz" "${NAME}.tar"
+        Push-AppveyorArtifact "${NAME}.tar.gz"
+
+deploy:
+  artifact: /.*\.tar.gz/
+  auth_token:
+    secure: W0QWCXm6EgiwSZ43z64VZdxZSHNsZwaulEthPjcn6L4lBcA4JSCkpsjAMA9o9agD
+  description: ''
+  on:
+    appveyor_repo_tag: true
+  provider: GitHub
+  force_update: true
