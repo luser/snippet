@@ -4,6 +4,7 @@ environment:
   matrix:
     - channel: stable
       target: x86_64-pc-windows-msvc
+      DEPLOY_RELEASE: true
     - channel: beta
       target: x86_64-pc-windows-msvc
     - channel: nightly
@@ -49,9 +50,10 @@ before_deploy:
 deploy:
   artifact: /.*\.tar.gz/
   auth_token:
-    secure: W0QWCXm6EgiwSZ43z64VZdxZSHNsZwaulEthPjcn6L4lBcA4JSCkpsjAMA9o9agD
+    secure: 20r13P3/IFozMemJGiXrAilhMyNGSrZ5UefPx6w4V2ZQmaqWGArCSKhM/CclDoMu
   description: ''
   on:
     appveyor_repo_tag: true
+    DEPLOY_RELEASE: true
   provider: GitHub
   force_update: true
