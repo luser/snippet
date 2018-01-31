@@ -1,17 +1,5 @@
 os: Visual Studio 2015
 
-environment:
-  matrix:
-    - channel: stable
-      target: x86_64-pc-windows-msvc
-      DEPLOY_RELEASE: true
-    - channel: beta
-      target: x86_64-pc-windows-msvc
-    - channel: nightly
-      target: x86_64-pc-windows-msvc
-    - channel: 1.21.0 # Oldest supported version. Keep in sync with README.md.
-      target: x86_64-pc-windows-msvc
-
 cache:
   - 'C:\Users\appveyor\.cargo'
   - target
@@ -28,32 +16,57 @@ install:
 - cargo -V
 
 build_script:
-- cmd: cargo build --release --verbose
+- cmd: cargo build %RELEASE% --verbose
 
 test_script:
-- cmd: cargo test --all --release --verbose
+- cmd: cargo test --all %RELEASE% --verbose
 
-branches:
-  only:
-    - master
-    - /\d+\.\d+\.\d+/
+for:
 
-before_deploy:
-  - ps: |
-        $NAME = "snippet-${env:APPVEYOR_REPO_TAG_NAME}-${env:TARGET}"
-        New-Item -Path $NAME -ItemType directory
-        Copy-Item target/release/snippet.exe "${NAME}/"
-        7z a -ttar "${NAME}.tar" "${NAME}"
-        7z a "${NAME}.tar.gz" "${NAME}.tar"
-        Push-AppveyorArtifact "${NAME}.tar.gz"
+-
+  branches:
+    only:
+      - master
+  environment:
+    matrix:
+      - channel: stable
+        target: x86_64-pc-windows-msvc
+      - channel: beta
+        target: x86_64-pc-windows-msvc
+      - channel: nightly
+        target: x86_64-pc-windows-msvc
+      - channel: 1.21.0 # Oldest supported version. Keep in sync with README.md.
+        target: x86_64-pc-windows-msvc
+        # Build a release build on master to make sure it builds.
+      - channel: stable
+        target: x86_64-pc-windows-msvc
+        RELEASE: --release
 
-deploy:
-  artifact: /.*\.tar.gz/
-  auth_token:
-    secure: 20r13P3/IFozMemJGiXrAilhMyNGSrZ5UefPx6w4V2ZQmaqWGArCSKhM/CclDoMu
-  description: ''
-  on:
-    appveyor_repo_tag: true
-    DEPLOY_RELEASE: true
-  provider: GitHub
-  force_update: true
+-
+  branches:
+    only:
+      - /\d+\.\d+\.\d+/
+  environment:
+    # Only build a release build for releases.
+    channel: stable
+    target: x86_64-pc-windows-msvc
+    RELEASE: --release
+
+  before_deploy:
+    - ps: |
+          $NAME = "snippet-${env:APPVEYOR_REPO_TAG_NAME}-${env:TARGET}"
+          New-Item -Path $NAME -ItemType directory
+          Copy-Item target/release/snippet.exe "${NAME}/"
+          7z a -ttar "${NAME}.tar" "${NAME}"
+          7z a "${NAME}.tar.gz" "${NAME}.tar"
+          Push-AppveyorArtifact "${NAME}.tar.gz"
+
+  deploy:
+    artifact: /.*\.tar.gz/
+    auth_token:
+      secure: 20r13P3/IFozMemJGiXrAilhMyNGSrZ5UefPx6w4V2ZQmaqWGArCSKhM/CclDoMu
+    description: ''
+    on:
+      appveyor_repo_tag: true
+    provider: GitHub
+    force_update: true
