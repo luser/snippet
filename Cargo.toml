@@ -1,6 +1,6 @@
 [package]
 name = "snippet"
-version = "0.1.3"
+version = "0.1.4-alpha.0"
 authors = ["Ted Mielczarek <ted@mielczarek.org>"]
 
 [dependencies]
