@@ -3,5 +3,5 @@ name = "snippet"
 version = "0.1.4-alpha.0"
 authors = ["Ted Mielczarek <ted@mielczarek.org>"]
 
-[dependencies]
-itoa = "0.3.4"
+[build-dependencies]
+cc = "1.0.17"
