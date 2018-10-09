@@ -5,3 +5,5 @@ authors = ["Ted Mielczarek <ted@mielczarek.org>"]
 
 [dependencies]
 itoa = "0.3.4"
+one = { path = "one" }
+two = { path = "two" }
