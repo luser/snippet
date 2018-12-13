@@ -7,3 +7,4 @@ authors = ["Ted Mielczarek <ted@mielczarek.org>"]
 itoa = "0.3.4"
 one = { path = "one" }
 two = { path = "two" }
+three = { git = "file:///build/three", rev = "297eafaa76d42b318ae11435ab910e725a92fce0" }
